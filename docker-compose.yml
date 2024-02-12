@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  postgres:
+    image: postgres:alpine
+    container_name: database_crud_actix
+    restart: always
+    ports:
+      - 5455:5432
+    expose:
+      - 5432:5432
+    env_file:
+      - ./.env

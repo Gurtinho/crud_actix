@@ -1,14 +1,28 @@
-use actix_web::{get, post, web, App, Responder, HttpServer, HttpResponse};
+use actix_web::{web, App, HttpServer};
+use sqlx::{Pool, Postgres};
 use dotenv::dotenv;
 
-mod databases;
+mod http;
+mod app;
 
-use crate::databases::connection;
+use crate::http::databases::connection::connection;
+use crate::http::routes::routes;
+
+pub struct AppState {
+    pool: Pool<Postgres>
+}
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
-    HttpServer::new(|| {
+    let pool = connection().await;
+    
+    println!("Server iniciado com sucesso! 🦀");
+
+    HttpServer::new(move || {
         App::new()
+        .app_data(web::Data::new(AppState { pool: pool.clone() }))
+        .configure(&routes)
+        // .wrap() // middlewares
     }).bind(("localhost", 9000)).unwrap().run().await
 }

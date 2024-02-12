@@ -1,4 +1,4 @@
-use sqlx::{postgres::PgPoolOptions, PgPool, Pool, Postgres};
+use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
 use std::env::*;
 
 pub async fn connection() -> Pool<Postgres> {
@@ -9,11 +9,11 @@ pub async fn connection() -> Pool<Postgres> {
     .await
   {
     Ok(pool) => {
-      println!("Conectado com o banco de dados! 🔥");
+      println!("Conectado com banco de dados 🔥");
       pool
     }
     Err(_) => {
-      println!("Falha ao se conectar com banco de dados 🧊");
+      println!("Falha ao conectar com banco de dados 🧊");
       std::process::exit(1);
     }
   };
