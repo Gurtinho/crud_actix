@@ -1,5 +1,4 @@
-use actix_web::{get, patch, post, delete, web, HttpResponse, Responder};
-use chrono::Utc;
+use actix_web::{web, HttpResponse, Responder};
 use uuid::Uuid;
 
 use crate::{
@@ -10,7 +9,7 @@ use crate::{
 };
 use crate::http::view_model::{http_error, http_response};
 
-#[post("/ticket")]
+
 pub async fn create_ticket(
   body: web::Json<CreateTicketSchema>,
   data: web::Data<AppState>
@@ -42,7 +41,7 @@ pub async fn create_ticket(
   }
 }
 
-#[get("/tickets")]
+
 pub async fn get_tickets(
   data: web::Data<AppState>
 ) -> impl Responder {
@@ -61,10 +60,12 @@ pub async fn get_tickets(
     );
   }
 
-  http_response(HttpResponse::Ok(), serde_json::json!(&result.unwrap()))
+  http_response(
+    HttpResponse::Ok(),
+     serde_json::json!(&result.unwrap())
+  )
 }
 
-#[get("/tickets/{id}")]
 pub async fn get_ticket(
   path: web::Path<uuid::Uuid>,
   data: web::Data<AppState>
@@ -79,15 +80,20 @@ pub async fn get_ticket(
 
   match result {
     Ok(ticket) => {
-      return http_response(HttpResponse::Ok(), serde_json::json!(&ticket))
+      return http_response(
+        HttpResponse::Ok(), 
+        serde_json::json!(&ticket)
+      )
     }
     Err(e) => {
-      return http_error(HttpResponse::InternalServerError(), format!("{:?}", &e))
+      return http_error(
+        HttpResponse::InternalServerError(),
+         format!("{:?}", &e)
+      )
     }
   }
 }
 
-#[patch("/ticket/{id}")]
 pub async fn update_ticket(
   path: web::Path<uuid::Uuid>,
   body: web::Json<UpdateTicketSchema>,
@@ -102,8 +108,8 @@ pub async fn update_ticket(
 
   if ticket_found.is_err() {
     return http_error(
-     HttpResponse::InternalServerError(),
-    format!("Id não encontrado: {}", &ticket_id)
+      HttpResponse::InternalServerError(),
+      format!("Id not found: {}", &ticket_id)
     );
   }
 
@@ -120,10 +126,40 @@ pub async fn update_ticket(
 
   match result {
     Ok(ticket) => {
-      return http_response(HttpResponse::Ok(), serde_json::json!(&ticket));
+      return http_response(
+        HttpResponse::Ok(),
+        serde_json::json!(&ticket)
+      );
     }
     Err(e) => {
-      return http_error(HttpResponse::InternalServerError(), format!("{:?}", &e))
+      return http_error(
+        HttpResponse::InternalServerError(),
+        format!("{:?}", &e)
+      )
     }
   }
+}
+
+pub async fn delete_ticket(
+  path: web::Path<uuid::Uuid>,
+  data: web::Data<AppState>
+) -> impl Responder {
+  let id = path.into_inner();
+  let result = sqlx::query!(
+    "DELETE FROM tickets WHERE id = $1",
+    &id,
+  ).execute(&data.pool).await.unwrap().rows_affected();
+
+  if result == 0 {
+    let message = format!("Id not found {}", &id);
+    return http_error(
+      HttpResponse::InternalServerError(),
+      message
+    )
+  }
+
+  http_response(
+    HttpResponse::Ok(),
+    serde_json::json!("ok")
+  )
 }

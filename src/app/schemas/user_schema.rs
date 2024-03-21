@@ -17,8 +17,7 @@ pub struct CreateUserSchema {
 pub struct UpdateUserSchema {
   pub username: String,
   pub email: String,
-  pub password: String,
-  pub updated_at: chrono::NaiveDateTime
+  pub password: String
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -29,4 +28,18 @@ pub struct GetUserSchema {
   pub password: String,
   pub created_at: chrono::NaiveDateTime,
   pub updated_at: chrono::NaiveDateTime
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct LoginUserSchema {
+  email: String,
+  password: String
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct JWTClaimsSchema {
+  exp: usize,
+  username: String,
+  email: String,
+  sub: uuid::Uuid
 }
