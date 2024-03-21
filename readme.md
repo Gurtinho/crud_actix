@@ -1,6 +1,6 @@
 ## CRUD ACTIX
 
-##### Uma api simples, para aprender como funciona o framework actix
+##### Uma api simples usando o framework actix
 
 Routes
 - [✅] tickets
@@ -8,6 +8,8 @@ Routes
 
 <br/>
 
+- [] rabbitmq
+- [] jwt
 - [] swagger
 - [] tests
 - [✅] docker
